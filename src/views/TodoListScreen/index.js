@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import React, { useState } from 'react';
 
-import { Text, View, TextInput, Button, StyleSheet, FlatList } from 'react-native';
+import { Text, View, TextInput, Button, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 
 const TodoListScreen = () => {
 
@@ -15,19 +15,27 @@ const TodoListScreen = () => {
     const handleAddTodo = () => {
         if (inputText !== '') {
             if (inputText.trim().length > 0) {
-                setTodoList((value) => value.concat({ text: inputText }));
+                setTodoList((value) => value.concat({ text: inputText, completed: false }));
                 // setTodoList([...todoList, inputText]);
                 setInputText('');
             }
         }
     };
 
+    const toggleTodo = (index) => {
+        const newTodoList = [...todoList];
+        newTodoList[index].completed = !newTodoList[index].completed;
+        setTodoList(newTodoList);
+    };
+
     const handleRenderListItem = ({ item, index }) => {
         return (
-            <View style={styles.todo}>
-                <Text>{index + 1}. </Text>
-                <Text>{item.text}</Text>
-            </View>
+            <TouchableOpacity onPress={() => toggleTodo(index)} style={styles.TouchableOpacity} >
+                <View style={styles.todo}>
+                    <Text style={item.completed ? styles.completedTodo : styles.fontTask}>{index + 1}. </Text>
+                    <Text style={item.completed ? styles.completedTodo : styles.fontTask}>{item.text}</Text>
+                </View>
+            </TouchableOpacity>
         );
     };
 
@@ -57,7 +65,6 @@ const TodoListScreen = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#000',
         alignItems: 'center',
         justifyContent: 'center',
         paddingTop: 80,
@@ -83,8 +90,24 @@ const styles = StyleSheet.create({
     todo: {
         flexDirection: 'row',
         alignItems: 'center',
+        width: '100%',
         marginHorizontal: 20,
         marginBottom: 10,
+    },
+    todoText: {
+        flex: 1,
+    },
+    fontTask: {
+        fontSize: 23,
+        color: 'white',
+    },
+    completedTodo: {
+        fontSize: 23,
+        textDecorationLine: 'line-through',
+        color: 'red',
+    },
+    TouchableOpacity: {
+        width: '100%',
     },
 });
 
