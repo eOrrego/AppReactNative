@@ -1,12 +1,29 @@
 /* eslint-disable prettier/prettier */
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { Text, View, TextInput, Button, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { AsyncStorage } from 'react-native';
+
 
 const TodoListScreen = () => {
 
     const [todoList, setTodoList] = useState([]);
     const [inputText, setInputText] = useState('');
+
+    useEffect(() => {
+        loadData();
+    }, []);
+
+    const loadData = async () => {
+        try {
+            const value = await AsyncStorage.getItem('todo_list');
+            if (value !== null) {
+                setTodoList(JSON.parse(value));
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
 
     const handleChangeText = (text) => {
         setInputText(text);
@@ -22,9 +39,18 @@ const TodoListScreen = () => {
         }
     };
 
+    const saveData = async (newTodoList) => {
+        try {
+            await AsyncStorage.setItem('todo_list', JSON.stringify(newTodoList));
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
     const toggleTodo = (index) => {
         const newTodoList = [...todoList];
         newTodoList[index].completed = !newTodoList[index].completed;
+        saveData(newTodoList);
         setTodoList(newTodoList);
     };
 
@@ -46,6 +72,7 @@ const TodoListScreen = () => {
                 <TextInput
                     style={styles.input}
                     placeholder="Escribe una tarea"
+                    placeholderTextColor="#777"
                     value={inputText}
                     onChangeText={handleChangeText}
                 />
@@ -73,6 +100,7 @@ const styles = StyleSheet.create({
         fontSize: 24,
         fontWeight: 'bold',
         marginBottom: 20,
+        color: 'black',
     },
     inputContainer: {
         flexDirection: 'row',
@@ -86,6 +114,8 @@ const styles = StyleSheet.create({
         borderColor: '#777',
         padding: 10,
         marginRight: 10,
+        color: 'black',
+        fontSize: 20,
     },
     todo: {
         flexDirection: 'row',
@@ -99,7 +129,7 @@ const styles = StyleSheet.create({
     },
     fontTask: {
         fontSize: 23,
-        color: 'white',
+        color: 'black',
     },
     completedTodo: {
         fontSize: 23,
